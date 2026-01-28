@@ -8,7 +8,7 @@ import { ShipList } from "@/components/ShipList";
 
 export default function Home() {
   const [selectedAircraft, setSelectedAircraft] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"aircraft" | "ships">("aircraft");
+  const [activeTab, setActiveTab] = useState<"all" | "aircraft" | "ships">("all");
 
   return (
     <div className="h-screen flex flex-col bg-zinc-950">
@@ -20,6 +20,16 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           <div className="flex bg-zinc-900 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`px-3 py-1 rounded text-sm transition-colors ${
+                activeTab === "all"
+                  ? "bg-zinc-700 text-white"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              All
+            </button>
             <button
               onClick={() => setActiveTab("aircraft")}
               className={`px-3 py-1 rounded text-sm transition-colors ${
@@ -51,13 +61,13 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left sidebar */}
         <div className="w-72 border-r border-zinc-800 shrink-0">
-          {activeTab === "aircraft" ? (
+          {activeTab === "ships" ? (
+            <ShipList />
+          ) : (
             <AircraftList
               selectedAircraft={selectedAircraft || undefined}
               onSelectAircraft={setSelectedAircraft}
             />
-          ) : (
-            <ShipList />
           )}
         </div>
 
@@ -65,7 +75,8 @@ export default function Home() {
         <div className="flex-1">
           <AircraftMap
             onSelectAircraft={setSelectedAircraft}
-            showShips={activeTab === "ships"}
+            showShips={activeTab === "all" || activeTab === "ships"}
+            showAircraft={activeTab === "all" || activeTab === "aircraft"}
           />
         </div>
 

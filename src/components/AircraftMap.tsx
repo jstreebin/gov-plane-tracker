@@ -58,9 +58,10 @@ interface Ship {
 interface AircraftMapProps {
   onSelectAircraft?: (icaoHex: string) => void;
   showShips?: boolean;
+  showAircraft?: boolean;
 }
 
-export function AircraftMap({ onSelectAircraft, showShips = false }: AircraftMapProps) {
+export function AircraftMap({ onSelectAircraft, showShips = false, showAircraft = true }: AircraftMapProps) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [ships, setShips] = useState<Ship[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,15 +98,20 @@ export function AircraftMap({ onSelectAircraft, showShips = false }: AircraftMap
 
   useEffect(() => {
     setMounted(true);
+
+    if (showAircraft) {
+      fetchPositions();
+    }
     if (showShips) {
       fetchShips();
-    } else {
-      fetchPositions();
-      // Refresh aircraft every 30 seconds
+    }
+
+    // Refresh aircraft every 30 seconds if showing aircraft
+    if (showAircraft) {
       const interval = setInterval(fetchPositions, 30000);
       return () => clearInterval(interval);
     }
-  }, [fetchPositions, fetchShips, showShips]);
+  }, [fetchPositions, fetchShips, showShips, showAircraft]);
 
   if (!mounted) {
     return (
@@ -130,7 +136,7 @@ export function AircraftMap({ onSelectAircraft, showShips = false }: AircraftMap
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
-        {!showShips && airbornePositions.map((pos) => (
+        {showAircraft && airbornePositions.map((pos) => (
           <Marker
             key={pos.hex}
             position={[pos.lat!, pos.lon!]}
@@ -184,13 +190,19 @@ export function AircraftMap({ onSelectAircraft, showShips = false }: AircraftMap
 
       {/* Status overlay */}
       <div className="absolute top-4 right-4 bg-zinc-900/90 text-white px-4 py-2 rounded-lg text-sm z-[1000]">
-        <p>
-          {loading
-            ? "Loading..."
-            : showShips
-              ? `${shipsWithPosition.length} ships visible`
-              : `${airbornePositions.length} aircraft visible`}
-        </p>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <>
+            {showAircraft && showShips ? (
+              <p>{airbornePositions.length} aircraft, {shipsWithPosition.length} ships</p>
+            ) : showShips ? (
+              <p>{shipsWithPosition.length} ships visible</p>
+            ) : (
+              <p>{airbornePositions.length} aircraft visible</p>
+            )}
+          </>
+        )}
         {lastUpdate && <p className="text-zinc-400 text-xs">Updated: {lastUpdate}</p>}
       </div>
     </div>
