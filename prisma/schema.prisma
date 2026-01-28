@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Aircraft {
+  id           String   @id @default(cuid())
+  icaoHex      String   @unique
+  registration String
+  operator     String
+  type         String
+  icaoType     String
+  category     String
+  tags         String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  flights      Flight[]
+  positions    Position[]
+
+  @@index([operator])
+  @@index([category])
+}
+
+model Flight {
+  id           String    @id @default(cuid())
+  aircraftId   String
+  callsign     String?
+  startTime    DateTime
+  endTime      DateTime?
+  origin       String?
+  destination  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  aircraft     Aircraft  @relation(fields: [aircraftId], references: [id], onDelete: Cascade)
+  positions    Position[]
+
+  @@index([aircraftId])
+  @@index([startTime])
+}
+
+model Position {
+  id          String   @id @default(cuid())
+  aircraftId  String
+  flightId    String?
+  latitude    Float
+  longitude   Float
+  altitude    Int?
+  groundSpeed Int?
+  heading     Int?
+  verticalRate Int?
+  squawk      String?
+  onGround    Boolean  @default(false)
+  timestamp   DateTime
+  createdAt   DateTime @default(now())
+
+  aircraft    Aircraft @relation(fields: [aircraftId], references: [id], onDelete: Cascade)
+  flight      Flight?  @relation(fields: [flightId], references: [id], onDelete: SetNull)
+
+  @@index([aircraftId, timestamp])
+  @@index([flightId])
+  @@index([timestamp])
+}
+
+model Ship {
+  id           String   @id @default(cuid())
+  hullNumber   String   @unique
+  name         String
+  class        String
+  type         String
+  homePort     String?
+  status       String   @default("Active")
+  latitude     Float?
+  longitude    Float?
+  region       String?
+  lastUpdate   DateTime?
+  source       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([type])
+  @@index([status])
+}
