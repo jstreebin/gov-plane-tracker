@@ -15,9 +15,10 @@ interface Aircraft {
 interface AircraftListProps {
   selectedAircraft?: string;
   onSelectAircraft?: (icaoHex: string) => void;
+  label?: string;
 }
 
-export function AircraftList({ selectedAircraft, onSelectAircraft }: AircraftListProps) {
+export function AircraftList({ selectedAircraft, onSelectAircraft, label = "aircraft" }: AircraftListProps) {
   const [aircraft, setAircraft] = useState<Aircraft[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
@@ -126,7 +127,7 @@ export function AircraftList({ selectedAircraft, onSelectAircraft }: AircraftLis
       </div>
 
       <div className="p-4 border-t border-zinc-800 text-zinc-500 text-sm">
-        {filteredAircraft.length} of {aircraft.length} aircraft
+        {filteredAircraft.length} of {aircraft.length} {label}
       </div>
     </div>
   );

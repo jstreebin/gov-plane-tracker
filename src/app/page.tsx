@@ -67,6 +67,7 @@ export default function Home() {
             <AircraftList
               selectedAircraft={selectedAircraft || undefined}
               onSelectAircraft={setSelectedAircraft}
+              label={activeTab === "all" ? "assets" : "aircraft"}
             />
           )}
         </div>
