@@ -5,6 +5,7 @@ import { AircraftMap } from "@/components/AircraftMap";
 import { AircraftList } from "@/components/AircraftList";
 import { AircraftDetail } from "@/components/AircraftDetail";
 import { ShipList } from "@/components/ShipList";
+import { AssetList } from "@/components/AssetList";
 
 export default function Home() {
   const [selectedAircraft, setSelectedAircraft] = useState<string | null>(null);
@@ -61,13 +62,17 @@ export default function Home() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left sidebar */}
         <div className="w-72 border-r border-zinc-800 shrink-0">
-          {activeTab === "ships" ? (
+          {activeTab === "all" ? (
+            <AssetList
+              selectedAsset={selectedAircraft || undefined}
+              onSelectAircraft={setSelectedAircraft}
+            />
+          ) : activeTab === "ships" ? (
             <ShipList />
           ) : (
             <AircraftList
               selectedAircraft={selectedAircraft || undefined}
               onSelectAircraft={setSelectedAircraft}
-              label={activeTab === "all" ? "assets" : "aircraft"}
             />
           )}
         </div>
